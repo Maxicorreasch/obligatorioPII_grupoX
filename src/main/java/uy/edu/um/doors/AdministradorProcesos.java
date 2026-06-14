@@ -3,6 +3,7 @@ package uy.edu.um.doors;
 import lombok.Getter;
 import uy.edu.um.tad.heap.MyHeap;
 import uy.edu.um.tad.heap.MyHeapImpl;
+import uy.edu.um.tad.queue.EmptyQueueException;
 import uy.edu.um.tad.queue.MyQueue;
 import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.MyStack;
@@ -31,6 +32,19 @@ public class AdministradorProcesos {
         procesosTerminados = new MyStackImpl<>();
         procesosRunning = null;
     }
+
+    public void pepararProcesos() throws EmptyQueueException {
+
+        while(!procesosTerminados.isEmpty()){
+            Proceso proceso = procesosNew.dequeue();
+
+            proceso.calcularPrioridad();
+            proceso.setEstado("PENDING");
+            procesosPending.insert(proceso);
+        }
+    }
+
+
 
 
 
