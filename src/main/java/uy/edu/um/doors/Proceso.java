@@ -18,7 +18,7 @@ public class Proceso implements Comparable<Proceso> {
     private MyList<Evento> eventos;
 
 
-    public Proceso(int PID, String nombre, Usuario propietario){
+    public Proceso(int PID, String nombre, Usuario propietario, MyList<Evento> eventos) {
         this.PID = PID;
         this.nombre = nombre;
         this.propietario = propietario;
