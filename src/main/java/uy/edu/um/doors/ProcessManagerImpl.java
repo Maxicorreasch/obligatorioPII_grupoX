@@ -4,34 +4,40 @@ public class ProcessManagerImpl implements ProcessManager{
 
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
 
+    private AdministradorProcesos administrador;
+
+    public ProcessManagerImpl(){
+        administrador = new AdministradorProcesos();
+    }
+
     @Override
     public void loadProcessAndUserData(String processCsvPath, String usersCsvPath) {
-        System.out.println("IMPLEMENTAR");
+        administrador.pload(processCsvPath, usersCsvPath);
     }
 
     @Override
     public void prepareProcesses() {
-        System.out.println("IMPLEMENTAR");
+        administrador.prepararProcesos();
     }
 
     @Override
     public void executeNextProcess() {
-        System.out.println("IMPLEMENTAR");
+        administrador.ejecutarProcesos();
     }
 
     @Override
     public void finishProcessOk() {
-        System.out.println("IMPLEMENTAR");
+        administrador.finalizarProcesoOK();
     }
 
     @Override
     public void finishProcessError() {
-        System.out.println("IMPLEMENTAR");
+        administrador.finalizarProcesoError();
     }
 
     @Override
     public void terminateProcess(int uid) {
-        System.out.println("IMPLEMENTAR");
+        administrador.finalizarProcesoTerminado(uid);
     }
 
     @Override
