@@ -14,7 +14,7 @@ public class Proceso implements Comparable<Proceso> {
     private String nombre;
     private Usuario propietario;
     private int prioridad;
-    private String estado; //new,pending,running,finished
+    private String estado; //new,pending,running, ok, error, terminated
     private MyList<Evento> eventos;
 
 
@@ -22,6 +22,7 @@ public class Proceso implements Comparable<Proceso> {
         this.PID = PID;
         this.nombre = nombre;
         this.propietario = propietario;
+        this.eventos = eventos;
         this.prioridad = 0;
         this.estado = "NEW";
     }
