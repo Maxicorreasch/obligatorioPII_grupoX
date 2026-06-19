@@ -28,7 +28,7 @@ import java.io.IOException;
 
 public class AdministradorProcesos {
 
-    private static final int MAX_PROCESOS_TERMINADOS = 10;
+    private static final int MAX_PROCESOS_TERMINADOS = 3;
 
     private MyQueue<Proceso> procesosNew;
 
@@ -40,6 +40,8 @@ public class AdministradorProcesos {
 
     private MyHash<Integer, Usuario> usuarios;
 
+    private Log log;
+
     private void finalizarProcesos(String estado) {
 
         if(procesosRunning == null) {
@@ -47,12 +49,11 @@ public class AdministradorProcesos {
         }
 
         if(procesosTerminados.size() == MAX_PROCESOS_TERMINADOS) {
-            System.out.println("Proceso terminado stack overflow");
+            log.logStackOverflow(procesosTerminados);
 
             while (!procesosTerminados.isEmpty()) {
                 try {
-                    Proceso proceso = procesosTerminados.pop();
-                    System.out.println("Proceso terminado: " + proceso);
+                    procesosTerminados.pop();
 
                 } catch (EmptyStackException e) {
                     System.out.println("Error al terminar el proceso");
@@ -61,12 +62,11 @@ public class AdministradorProcesos {
         }
 
         procesosRunning.setEstado(estado);
+        log.logFinalizacion(procesosRunning, estado);
         System.out.println("Ending process: PID=" + procesosRunning.getPID() + " Stage: " + estado);
 
         procesosTerminados.push(procesosRunning);
         procesosRunning = null;
-
-
 
     }
 
@@ -76,12 +76,11 @@ public class AdministradorProcesos {
         }
 
         if(procesosTerminados.size() == MAX_PROCESOS_TERMINADOS) {
-            System.out.println("Proceso terminado stack overflow");
+            log.logStackOverflow(procesosTerminados);
 
             while (!procesosTerminados.isEmpty()) {
                 try {
-                    Proceso proceso = procesosTerminados.pop();
-                    System.out.println("Proceso terminado: " + proceso);
+                    procesosTerminados.pop();
                 }catch (EmptyStackException e) {
                     System.out.println("Error al terminar el proceso");
                 }
@@ -89,6 +88,7 @@ public class AdministradorProcesos {
         }
 
         procesosRunning.setEstado(estado);
+        log.logFinalizacionTerminado(procesosRunning, estado, usuario);
         System.out.println("Ending process: PID=" + procesosRunning.getPID() + " Stage: " + estado + " Usuario: " + usuario.getAlias() + " UID: " + usuario.getUID());
 
         procesosTerminados.push(procesosRunning);
@@ -102,6 +102,7 @@ public class AdministradorProcesos {
         procesosPending = new MyHeapImpl<>(false);
         procesosTerminados = new MyStackImpl<>();
         usuarios = new MyHashImpl<>();
+        log = new Log();
         procesosRunning = null;
     }
 
@@ -116,6 +117,7 @@ public class AdministradorProcesos {
                 proceso.calcularPrioridad();
                 proceso.setEstado("PENDING");
                 procesosPending.insert(proceso);
+                log.logNuevoPendiente(proceso);
             } catch (EmptyQueueException e){
                 System.out.println("Error: no hay procesos NEW");
             }
@@ -132,6 +134,7 @@ public class AdministradorProcesos {
                 proceso.setEstado("RUNNING");
 
                 procesosRunning = proceso;
+                log.logEjecucion(proceso);
             } catch (EmptyHeapException e){
                 System.out.println("Error: no hay procesos RUNNING");
             }
@@ -197,6 +200,9 @@ public class AdministradorProcesos {
             BufferedReader br = new BufferedReader(new FileReader(pathProcessos));
 
             String linea;
+
+            br.readLine();
+
 
             while ((linea = br.readLine()) != null){
                 String[] datos = linea.split(";", 4);
