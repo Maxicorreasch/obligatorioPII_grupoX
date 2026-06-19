@@ -44,11 +44,11 @@ public class AdministradorProcesos {
 
     private void finalizarProcesos(String estado) {
 
-        if(procesosRunning == null) {
+        if (procesosRunning == null) {
             return;
         }
 
-        if(procesosTerminados.size() == MAX_PROCESOS_TERMINADOS) {
+        if (procesosTerminados.size() == MAX_PROCESOS_TERMINADOS) {
             log.logStackOverflow(procesosTerminados);
 
             while (!procesosTerminados.isEmpty()) {
@@ -70,18 +70,18 @@ public class AdministradorProcesos {
 
     }
 
-    private void finalizarProcesos(String estado, Usuario usuario){
-        if(procesosRunning == null) {
+    private void finalizarProcesos(String estado, Usuario usuario) {
+        if (procesosRunning == null) {
             return;
         }
 
-        if(procesosTerminados.size() == MAX_PROCESOS_TERMINADOS) {
+        if (procesosTerminados.size() == MAX_PROCESOS_TERMINADOS) {
             log.logStackOverflow(procesosTerminados);
 
             while (!procesosTerminados.isEmpty()) {
                 try {
                     procesosTerminados.pop();
-                }catch (EmptyStackException e) {
+                } catch (EmptyStackException e) {
                     System.out.println("Error al terminar el proceso");
                 }
             }
@@ -96,7 +96,6 @@ public class AdministradorProcesos {
     }
 
 
-
     public AdministradorProcesos() {
         procesosNew = new MyQueueImpl<>();
         procesosPending = new MyHeapImpl<>(false);
@@ -108,7 +107,7 @@ public class AdministradorProcesos {
 
     public void prepararProcesos() {
 
-        while(!procesosNew.isEmpty()){
+        while (!procesosNew.isEmpty()) {
             try {
 
 
@@ -118,7 +117,7 @@ public class AdministradorProcesos {
                 proceso.setEstado("PENDING");
                 procesosPending.insert(proceso);
                 log.logNuevoPendiente(proceso);
-            } catch (EmptyQueueException e){
+            } catch (EmptyQueueException e) {
                 System.out.println("Error: no hay procesos NEW");
             }
         }
@@ -135,7 +134,7 @@ public class AdministradorProcesos {
 
                 procesosRunning = proceso;
                 log.logEjecucion(proceso);
-            } catch (EmptyHeapException e){
+            } catch (EmptyHeapException e) {
                 System.out.println("Error: no hay procesos RUNNING");
             }
         }
@@ -149,7 +148,7 @@ public class AdministradorProcesos {
         finalizarProcesos("ERROR");
     }
 
-    public void finalizarProcesoTerminado(int uid){
+    public void finalizarProcesoTerminado(int uid) {
         Usuario usuario = usuarios.get(uid);
 
         if (usuario == null) {
@@ -161,20 +160,19 @@ public class AdministradorProcesos {
     }
 
 
-
     public void agregarUsuario(Usuario usuario) {
         usuarios.put(usuario.getUID(), usuario);
     }
 
-    private void cargarUsuarios(String pathUsuarios){
-        try{
+    private void cargarUsuarios(String pathUsuarios) {
+        try {
             BufferedReader br = new BufferedReader(new FileReader(pathUsuarios));
 
             String linea;
 
             br.readLine();
 
-            while ((linea = br.readLine()) != null){
+            while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(";");
 
                 int uid = Integer.parseInt(datos[0]);
@@ -187,15 +185,15 @@ public class AdministradorProcesos {
 
             }
             br.close();
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Error al cargar el usuario");
         }
 
     }
 
-    private void cargarProcesos(String pathProcessos){
+    private void cargarProcesos(String pathProcessos) {
 
-        try{
+        try {
 
             BufferedReader br = new BufferedReader(new FileReader(pathProcessos));
 
@@ -204,7 +202,7 @@ public class AdministradorProcesos {
             br.readLine();
 
 
-            while ((linea = br.readLine()) != null){
+            while ((linea = br.readLine()) != null) {
                 String[] datos = linea.split(";", 4);
 
                 int pid = Integer.parseInt(datos[0]);
@@ -216,18 +214,18 @@ public class AdministradorProcesos {
 
                 MyList<Evento> eventos = new MyLinkedListImpl<>();
 
-                datosEventos = datosEventos.substring(1,datosEventos.length()-1);
+                datosEventos = datosEventos.substring(1, datosEventos.length() - 1);
                 String[] eventosSeparados = datosEventos.split("#");
 
-                for(String eventoTexto: eventosSeparados){
+                for (String eventoTexto : eventosSeparados) {
                     String[] partesEvento = eventoTexto.split(":");
                     String tipoEvento = partesEvento[0].trim();
 
-                    String instruccionesTexto = partesEvento[1].replace("[","").replace("]", "");
+                    String instruccionesTexto = partesEvento[1].replace("[", "").replace("]", "");
                     String[] instruccionesArray = instruccionesTexto.split(",");
 
                     MyList<String> instrucciones = new MyLinkedListImpl<>();
-                    for(String instruccion: instruccionesArray){
+                    for (String instruccion : instruccionesArray) {
                         instrucciones.add(instruccion.trim());
                     }
 
@@ -237,36 +235,31 @@ public class AdministradorProcesos {
                 }
 
 
-
-
                 Proceso proceso = new Proceso(pid, nombre, propietario, eventos);
                 procesosNew.enqueue(proceso);
             }
-
             br.close();
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Error al cargar el proceso");
         }
 
     }
 
-    public void pload(String pathProcesos, String pathUsuarios){
+    public void pload(String pathProcesos, String pathUsuarios) {
 
         cargarUsuarios(pathUsuarios);
 
         cargarProcesos(pathProcesos);
 
     }
-/// test
-// ---- Helpers de formato ----
 
-private String formatearProceso(Proceso p) {
-    return "PID=" + p.getPID()
-            + " | " + p.getNombre()
-            + " | USER:" + p.getPropietario().getAlias()
-            + " UID:" + p.getPropietario().getUID()
-            + " | P=" + p.getPrioridad();
-}
+    private String formatearProceso(Proceso p) {
+        return "PID=" + p.getPID()
+                + " | " + p.getNombre()
+                + " | USER:" + p.getPropietario().getAlias()
+                + " UID:" + p.getPropietario().getUID()
+                + " | P=" + p.getPrioridad();
+    }
 
     private String formatearTerminado(Proceso p) {
         return "PID=" + p.getPID()
@@ -281,15 +274,22 @@ private String formatearProceso(Proceso p) {
     public void imprimirEstado() {
         System.out.println("PROCESS STATUS");
 
-        System.out.println("EXECUTING:");
-        if (procesosRunning != null) {
-            System.out.println("  " + formatearProceso(procesosRunning));
+        System.out.println("NEW:");
+        for (int i = 0; i < procesosNew.size(); i++) {
+            System.out.println("  " + formatearProceso(procesosNew.get(i)));
         }
 
         System.out.println("PENDING:");
         MyList<Proceso> pendientes = ((MyHeapImpl<Proceso>) procesosPending).toList();
         for (int i = 0; i < pendientes.size(); i++) {
             System.out.println("  " + formatearProceso(pendientes.get(i)));
+        }
+
+        System.out.println("EXECUTING:");
+        if (procesosRunning != null) {
+            System.out.println("  " + formatearProceso(procesosRunning));
+        } else {
+            System.out.println("  No hay proceso en ejecucion.");
         }
 
         System.out.println("FINISHED:");
@@ -304,15 +304,22 @@ private String formatearProceso(Proceso p) {
     public void imprimirEstadoVerbose() {
         System.out.println("PROCESS STATUS VERBOSE");
 
-        System.out.println("EXECUTING:");
-        if (procesosRunning != null) {
-            imprimirProcesoDetalle(procesosRunning);
+        System.out.println("NEW:");
+        for (int i = 0; i < procesosNew.size(); i++) {
+            imprimirProcesoDetalle(procesosNew.get(i));
         }
 
         System.out.println("PENDING:");
         MyList<Proceso> pendientes = ((MyHeapImpl<Proceso>) procesosPending).toList();
         for (int i = 0; i < pendientes.size(); i++) {
             imprimirProcesoDetalle(pendientes.get(i));
+        }
+
+        System.out.println("EXECUTING:");
+        if (procesosRunning != null) {
+            imprimirProcesoDetalle(procesosRunning);
+        } else {
+            System.out.println("  No hay proceso en ejecucion.");
         }
 
         System.out.println("FINISHED:");
@@ -322,21 +329,8 @@ private String formatearProceso(Proceso p) {
         }
     }
 
-    private void imprimirProcesoDetalle(Proceso p) {
-        System.out.println("  " + formatearProceso(p));
-        for (int j = 0; j < p.getEventos().size(); j++) {
-            Evento ev = p.getEventos().get(j);
-            StringBuilder sb = new StringBuilder("    EVENT: " + ev.getTipo() + " | Instructions [");
-            for (int k = 0; k < ev.getInstrucciones().size(); k++) {
-                sb.append(ev.getInstrucciones().get(k));
-                if (k < ev.getInstrucciones().size() - 1) sb.append(", ");
-            }
-            sb.append("]");
-            System.out.println(sb);
-        }
-    }
-
 //  pstatus -u [UID]
+
 
     public void imprimirEstadoPorUsuario(int uid) {
         Usuario usuario = usuarios.get(uid);
@@ -347,9 +341,12 @@ private String formatearProceso(Proceso p) {
 
         System.out.println("PROCESS STATUS - USER:" + usuario.getAlias() + " UID:" + uid);
 
-        if (procesosRunning != null && procesosRunning.getPropietario().getUID() == uid) {
-            System.out.println("EXECUTING:");
-            System.out.println("  " + formatearProceso(procesosRunning));
+        System.out.println("NEW:");
+        for (int i = 0; i < procesosNew.size(); i++) {
+            Proceso p = procesosNew.get(i);
+            if (p.getPropietario().getUID() == uid) {
+                System.out.println("  " + formatearProceso(p));
+            }
         }
 
         System.out.println("PENDING:");
@@ -361,12 +358,9 @@ private String formatearProceso(Proceso p) {
             }
         }
 
-        System.out.println("NEW:");
-        for (int i = 0; i < procesosNew.size(); i++) {
-            Proceso p = procesosNew.get(i);
-            if (p.getPropietario().getUID() == uid) {
-                System.out.println("  " + formatearProceso(p));
-            }
+        System.out.println("EXECUTING:");
+        if (procesosRunning != null && procesosRunning.getPropietario().getUID() == uid) {
+            System.out.println("  " + formatearProceso(procesosRunning));
         }
 
         System.out.println("FINISHED:");
@@ -380,5 +374,61 @@ private String formatearProceso(Proceso p) {
     }
 
 
+    //  pstatus -p [PID]
+    public void imprimirEstadoPorProceso(int pid) {
+        if (procesosRunning != null && procesosRunning.getPID() == pid) {
+            imprimirProcesoDetalle(procesosRunning);
+            return;
+        }
 
+        for (int i = 0; i < procesosNew.size(); i++) {
+            if (procesosNew.get(i).getPID() == pid) {
+                imprimirProcesoDetalle(procesosNew.get(i));
+                return;
+            }
+        }
+
+        MyList<Proceso> pendientes = ((MyHeapImpl<Proceso>) procesosPending).toList();
+        for (int i = 0; i < pendientes.size(); i++) {
+            if (pendientes.get(i).getPID() == pid) {
+                imprimirProcesoDetalle(pendientes.get(i));
+                return;
+            }
+        }
+
+        MyLinkedListImpl<Proceso> pila = (MyLinkedListImpl<Proceso>) procesosTerminados;
+        for (int i = pila.size() - 1; i >= 0; i--) {
+            if (pila.get(i).getPID() == pid) {
+                imprimirProcesoDetalle(pila.get(i));
+                return;
+            }
+        }
+
+        System.out.println("Proceso PID=" + pid + " no encontrado en memoria.");
+    }
+
+
+    private void imprimirProcesoDetalle(Proceso p) {
+        System.out.println("  " + formatearProceso(p));
+
+        for (int j = 0; j < p.getEventos().size(); j++) {
+            Evento ev = p.getEventos().get(j);
+            StringBuilder sb = new StringBuilder("    EVENT: " + ev.getTipo() + " | Instructions [");
+
+            for (int k = 0; k < ev.getInstrucciones().size(); k++) {
+                sb.append(ev.getInstrucciones().get(k));
+
+                if (k < ev.getInstrucciones().size() - 1) {
+                    sb.append(", ");
+                }
+            }
+
+            sb.append("]");
+            System.out.println(sb);
+        }
+    }
+    public void cerrarLog() {
+        log.cerrar();
+    }
 }
+/// test
