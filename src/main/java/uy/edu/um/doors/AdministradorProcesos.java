@@ -54,6 +54,11 @@ public class AdministradorProcesos {
         if (procesosTerminados.size() == MAX_PROCESOS_TERMINADOS) {
             log.logStackOverflow(procesosTerminados);
 
+            MyLinkedListImpl<Proceso> impl = (MyLinkedListImpl<Proceso>) procesosTerminados;
+            for (int i = 0; i < impl.size(); i++) {
+                procesosPorPID.remove(impl.get(i).getPID());
+            }
+
             while (!procesosTerminados.isEmpty()) {
                 try {
                     procesosTerminados.pop();
@@ -165,7 +170,7 @@ public class AdministradorProcesos {
             return;
         }
 
-        finalizarProcesos("TERMINADO", usuario);
+        finalizarProcesos("TERMINATED", usuario);
     }
 
 
@@ -417,4 +422,3 @@ public class AdministradorProcesos {
         log.cerrar();
     }
 }
-/// test
