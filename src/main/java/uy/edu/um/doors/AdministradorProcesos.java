@@ -257,12 +257,128 @@ public class AdministradorProcesos {
         cargarProcesos(pathProcesos);
 
     }
+/// test
+// ---- Helpers de formato ----
+
+private String formatearProceso(Proceso p) {
+    return "PID=" + p.getPID()
+            + " | " + p.getNombre()
+            + " | USER:" + p.getPropietario().getAlias()
+            + " UID:" + p.getPropietario().getUID()
+            + " | P=" + p.getPrioridad();
+}
+
+    private String formatearTerminado(Proceso p) {
+        return "PID=" + p.getPID()
+                + " " + p.getNombre()
+                + " | STATE: " + p.getEstado()
+                + " | USER:" + p.getPropietario().getAlias()
+                + " UID:" + p.getPropietario().getUID();
+    }
+
+// ---- pstatus ----
+
+    public void imprimirEstado() {
+        System.out.println("PROCESS STATUS");
+
+        System.out.println("EXECUTING:");
+        if (procesosRunning != null) {
+            System.out.println("  " + formatearProceso(procesosRunning));
+        }
+
+        System.out.println("PENDING:");
+        MyList<Proceso> pendientes = ((MyHeapImpl<Proceso>) procesosPending).toList();
+        for (int i = 0; i < pendientes.size(); i++) {
+            System.out.println("  " + formatearProceso(pendientes.get(i)));
+        }
+
+        System.out.println("FINISHED:");
+        MyLinkedListImpl<Proceso> pila = (MyLinkedListImpl<Proceso>) procesosTerminados;
+        for (int i = pila.size() - 1; i >= 0; i--) {
+            System.out.println("  " + formatearTerminado(pila.get(i)));
+        }
+    }
+
+//  pstatus -verbose
+
+    public void imprimirEstadoVerbose() {
+        System.out.println("PROCESS STATUS VERBOSE");
+
+        System.out.println("EXECUTING:");
+        if (procesosRunning != null) {
+            imprimirProcesoDetalle(procesosRunning);
+        }
+
+        System.out.println("PENDING:");
+        MyList<Proceso> pendientes = ((MyHeapImpl<Proceso>) procesosPending).toList();
+        for (int i = 0; i < pendientes.size(); i++) {
+            imprimirProcesoDetalle(pendientes.get(i));
+        }
+
+        System.out.println("FINISHED:");
+        MyLinkedListImpl<Proceso> pila = (MyLinkedListImpl<Proceso>) procesosTerminados;
+        for (int i = pila.size() - 1; i >= 0; i--) {
+            imprimirProcesoDetalle(pila.get(i));
+        }
+    }
+
+    private void imprimirProcesoDetalle(Proceso p) {
+        System.out.println("  " + formatearProceso(p));
+        for (int j = 0; j < p.getEventos().size(); j++) {
+            Evento ev = p.getEventos().get(j);
+            StringBuilder sb = new StringBuilder("    EVENT: " + ev.getTipo() + " | Instructions [");
+            for (int k = 0; k < ev.getInstrucciones().size(); k++) {
+                sb.append(ev.getInstrucciones().get(k));
+                if (k < ev.getInstrucciones().size() - 1) sb.append(", ");
+            }
+            sb.append("]");
+            System.out.println(sb);
+        }
+    }
+
+//  pstatus -u [UID]
+
+    public void imprimirEstadoPorUsuario(int uid) {
+        Usuario usuario = usuarios.get(uid);
+        if (usuario == null) {
+            System.out.println("Usuario UID=" + uid + " no encontrado.");
+            return;
+        }
+
+        System.out.println("PROCESS STATUS - USER:" + usuario.getAlias() + " UID:" + uid);
+
+        if (procesosRunning != null && procesosRunning.getPropietario().getUID() == uid) {
+            System.out.println("EXECUTING:");
+            System.out.println("  " + formatearProceso(procesosRunning));
+        }
+
+        System.out.println("PENDING:");
+        MyList<Proceso> pendientes = ((MyHeapImpl<Proceso>) procesosPending).toList();
+        for (int i = 0; i < pendientes.size(); i++) {
+            Proceso p = pendientes.get(i);
+            if (p.getPropietario().getUID() == uid) {
+                System.out.println("  " + formatearProceso(p));
+            }
+        }
+
+        System.out.println("NEW:");
+        for (int i = 0; i < procesosNew.size(); i++) {
+            Proceso p = procesosNew.get(i);
+            if (p.getPropietario().getUID() == uid) {
+                System.out.println("  " + formatearProceso(p));
+            }
+        }
+
+        System.out.println("FINISHED:");
+        MyLinkedListImpl<Proceso> pila = (MyLinkedListImpl<Proceso>) procesosTerminados;
+        for (int i = pila.size() - 1; i >= 0; i--) {
+            Proceso p = pila.get(i);
+            if (p.getPropietario().getUID() == uid) {
+                System.out.println("  " + formatearTerminado(p));
+            }
+        }
+    }
 
 
 
-
-
-
-
-    /// test
 }

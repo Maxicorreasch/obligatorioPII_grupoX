@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 public class Log {
 
     private static final DateTimeFormatter FORMATO_TIMESTAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final DateTimeFormatter FORMATO_FECHA     = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     private BufferedWriter writer;
 
@@ -92,6 +92,10 @@ public class Log {
     }
 
     private void escribir(String mensaje) {
+        if (writer == null) {
+            return;
+        }
+
         try {
             writer.write(mensaje);
             writer.newLine();
@@ -100,4 +104,5 @@ public class Log {
             System.out.println("Error al escribir en log: " + e.getMessage());
         }
     }
+
 }

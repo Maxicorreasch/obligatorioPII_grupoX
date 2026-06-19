@@ -1,5 +1,8 @@
 package uy.edu.um.tad.heap;
 
+import uy.edu.um.tad.list.MyLinkedListImpl;
+import uy.edu.um.tad.list.MyList;
+
 public class MyHeapImpl<T extends Comparable<T>> implements MyHeap<T> {
 
     private static final int DEFAULT_CAPACITY = 255;
@@ -156,5 +159,12 @@ public class MyHeapImpl<T extends Comparable<T>> implements MyHeap<T> {
         }
         sb.append("]");
         return sb.toString();
+    }
+    public MyList<T> toList() {
+        MyList<T> list = new MyLinkedListImpl<>();
+        for (int i = 0; i < size; i++) {
+            list.add(heap[i]);
+        }
+        return list;
     }
 }
