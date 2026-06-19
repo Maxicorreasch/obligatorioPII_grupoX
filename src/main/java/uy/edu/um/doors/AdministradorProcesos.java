@@ -2,8 +2,7 @@ package uy.edu.um.doors;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
 import uy.edu.um.tad.hash.MyHash;
 import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.EmptyHeapException;
@@ -17,6 +16,8 @@ import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.EmptyStackException;
 import uy.edu.um.tad.stack.MyStack;
 import uy.edu.um.tad.stack.MyStackImpl;
+import uy.edu.um.tad.binarytree.MySearchBinaryTree;
+import uy.edu.um.tad.binarytree.MySearchBinaryTreeImpl;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -41,6 +42,8 @@ public class AdministradorProcesos {
     private MyHash<Integer, Usuario> usuarios;
 
     private Log log;
+
+    private MySearchBinaryTree<Integer, Proceso> procesosPorPID;
 
     private void finalizarProcesos(String estado) {
 
@@ -78,6 +81,11 @@ public class AdministradorProcesos {
         if (procesosTerminados.size() == MAX_PROCESOS_TERMINADOS) {
             log.logStackOverflow(procesosTerminados);
 
+            MyLinkedListImpl<Proceso> impl = (MyLinkedListImpl<Proceso>) procesosTerminados;
+            for (int i = 0; i < impl.size(); i++) {
+                procesosPorPID.remove(impl.get(i).getPID());
+            }
+
             while (!procesosTerminados.isEmpty()) {
                 try {
                     procesosTerminados.pop();
@@ -103,6 +111,7 @@ public class AdministradorProcesos {
         usuarios = new MyHashImpl<>();
         log = new Log();
         procesosRunning = null;
+        procesosPorPID = new MySearchBinaryTreeImpl<>();
     }
 
     public void prepararProcesos() {
@@ -236,6 +245,7 @@ public class AdministradorProcesos {
 
 
                 Proceso proceso = new Proceso(pid, nombre, propietario, eventos);
+                procesosPorPID.add(pid, proceso);
                 procesosNew.enqueue(proceso);
             }
             br.close();
@@ -269,7 +279,7 @@ public class AdministradorProcesos {
                 + " UID:" + p.getPropietario().getUID();
     }
 
-// ---- pstatus ----
+//  pstatus
 
     public void imprimirEstado() {
         System.out.println("PROCESS STATUS");
@@ -376,37 +386,13 @@ public class AdministradorProcesos {
 
     //  pstatus -p [PID]
     public void imprimirEstadoPorProceso(int pid) {
-        if (procesosRunning != null && procesosRunning.getPID() == pid) {
-            imprimirProcesoDetalle(procesosRunning);
-            return;
+        Proceso p = procesosPorPID.find(pid);
+        if (p != null) {
+            imprimirProcesoDetalle(p);
+        } else {
+            System.out.println("Proceso PID=" + pid + " no encontrado en memoria.");
         }
-
-        for (int i = 0; i < procesosNew.size(); i++) {
-            if (procesosNew.get(i).getPID() == pid) {
-                imprimirProcesoDetalle(procesosNew.get(i));
-                return;
-            }
-        }
-
-        MyList<Proceso> pendientes = ((MyHeapImpl<Proceso>) procesosPending).toList();
-        for (int i = 0; i < pendientes.size(); i++) {
-            if (pendientes.get(i).getPID() == pid) {
-                imprimirProcesoDetalle(pendientes.get(i));
-                return;
-            }
-        }
-
-        MyLinkedListImpl<Proceso> pila = (MyLinkedListImpl<Proceso>) procesosTerminados;
-        for (int i = pila.size() - 1; i >= 0; i--) {
-            if (pila.get(i).getPID() == pid) {
-                imprimirProcesoDetalle(pila.get(i));
-                return;
-            }
-        }
-
-        System.out.println("Proceso PID=" + pid + " no encontrado en memoria.");
     }
-
 
     private void imprimirProcesoDetalle(Proceso p) {
         System.out.println("  " + formatearProceso(p));

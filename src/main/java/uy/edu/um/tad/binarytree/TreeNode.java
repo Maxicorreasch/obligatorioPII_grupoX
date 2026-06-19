@@ -106,10 +106,10 @@ public class TreeNode<K extends Comparable<K>, V> {
         int nValue = this.getKey().compareTo(key);
         if (nValue == 0)
             return this.value;
-        if (nValue > 0 && this.getRight() != null)
-            return this.getRight().find(key);
-        if (nValue < 0 && this.getLeft() != null)
+        if (nValue > 0 && this.getLeft() != null)
             return this.getLeft().find(key);
+        if (nValue < 0 && this.getRight() != null)
+            return this.getRight().find(key);
         return null;
     }
 }
