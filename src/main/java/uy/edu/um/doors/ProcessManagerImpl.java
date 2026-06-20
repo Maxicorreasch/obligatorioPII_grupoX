@@ -41,22 +41,22 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void printStatus() {
-        System.out.println("IMPLEMENTAR");
+    public void printStatus() {administrador.imprimirEstado();}
+
+    @Override
+    public void printStatusVerbose() {administrador.imprimirEstadoVerbose();
     }
 
     @Override
-    public void printStatusVerbose() {
-        System.out.println("IMPLEMENTAR");
+    public void printStatusByUser(int uid) { administrador.imprimirEstadoPorUsuario(uid)    ;
     }
 
     @Override
-    public void printStatusByUser(int uid) {
-        System.out.println("IMPLEMENTAR");
+    public void printStatusByProcess(int pid) {administrador.imprimirEstadoPorProceso(pid);
     }
 
     @Override
-    public void printStatusByProcess(int pid) {
-        System.out.println("IMPLEMENTAR");
+    public void cerrarLog() {
+        administrador.cerrarLog();
     }
 }

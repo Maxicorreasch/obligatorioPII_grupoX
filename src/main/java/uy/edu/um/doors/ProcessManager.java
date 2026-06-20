@@ -12,4 +12,4 @@ public interface ProcessManager {
     public void printStatusVerbose();
     public void printStatusByUser(int uid);
     public void printStatusByProcess(int pid);
-}
+    public void cerrarLog();}

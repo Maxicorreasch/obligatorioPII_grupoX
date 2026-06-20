@@ -47,6 +47,7 @@ public class ProcessConsole {
                     case "exit":
                     case "quit":
                         System.out.println("Finalizando Doors...");
+                        processManager.cerrarLog();
                         return;
                     default:
                         System.out.println("Comando no reconocido: " + command);
@@ -194,6 +195,7 @@ public class ProcessConsole {
 
     private void printHelp() {
         System.out.println("Comandos disponibles:");
+        System.out.println("  pload -p [path] -u [path]  Carga procesos y usuarios desde CSV");
         System.out.println("  pprepare              Prepara procesos nuevos y calcula prioridad");
         System.out.println("  pexecute              Ejecuta el próximo proceso pendiente");
         System.out.println("  pfinish OK            Finaliza el proceso actual correctamente");
